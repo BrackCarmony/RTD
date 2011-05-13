@@ -185,7 +185,7 @@ function drawMap()
 		var xOffset = 0; //Math.round(p.sprite.width / 2);
 		var yOffset = 0; //Math.round(p.sprite.height / 2);
 		
-		console.log(p);
+		//console.log(p);
 		
 		drawMe.drawImage(p.sprite, p.x - xOffset, p.y - yOffset);
 	}
