@@ -93,6 +93,11 @@ function spawnMonster(){
 	monster.hp = 50;
 	monster.atk = 50;
 	monster.color = "rgb(0,0,0)";
+	
+	monster.sprite = document.getElementById('img-monster-1');
+	//monster.sprite = new Image();
+	//monster.sprite.src = 'images/monster-1.gif';
+	
 	monsters.push(monster);
 }
 
@@ -169,11 +174,18 @@ function drawMap()
 	for (i in monsters)
 	{
 		p = monsters[i];
-		drawMe.beginPath();
+		/* drawMe.beginPath();
 		drawMe.fillStyle = p.color;
 		drawMe.arc(p.x,p.y,5,0,7);
 		drawMe.closePath();		
-		drawMe.fill();
+		drawMe.fill(); */
+		
+		var xOffset = 0; //Math.round(p.sprite.width / 2);
+		var yOffset = 0; //Math.round(p.sprite.height / 2);
+		
+		console.log(p);
+		
+		drawMe.drawImage(p.sprite, p.x - xOffset, p.y - yOffset);
 	}
 	for(i in effects)
 	{
