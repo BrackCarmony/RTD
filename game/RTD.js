@@ -42,7 +42,8 @@ function initGame(canvasElement)
     spawnHero();
     spawnMonster();
     drawMap();
-    updateID = setInterval(update,25);
+    //updateID = setInterval(update,25);
+	update();
 }
 
 
@@ -122,15 +123,21 @@ function drawMap()
 	drawMe.arc(town.x,town.y,20,0,Math.PI*2*town.health/maxTownHealth);
 	drawMe.closePath();
 	drawMe.fill();
-	var p 
+	var p;
 	for (i in trees)
 	{
 		p = trees[i];
-		drawMe.beginPath();
+		/* drawMe.beginPath();
 		drawMe.fillStyle = "rgb(20,120,50)";
 		drawMe.arc(p.x,p.y,5,0,7);
 		drawMe.closePath();
-		drawMe.fill();
+		drawMe.fill(); */
+		var img = new Image();
+		img.src = 'images/tree-s-' + p.type + '.png';
+		var xOffset = Math.round(img.width / 2);
+		var yOffset = Math.round(img.height / 2);
+		
+		drawMe.drawImage(img, p.x - xOffset, p.y - yOffset);
 	}
 	
 	//console.log(spawnPoints);
@@ -148,11 +155,16 @@ function drawMap()
 	for (i in heros)
 	{
 		p = heros[i];
-		drawMe.beginPath();
+		/* drawMe.beginPath();
 		drawMe.fillStyle = p.color;
 		drawMe.arc(p.x,p.y,10,0,7);
 		drawMe.closePath();
-		drawMe.fill();
+		drawMe.fill(); */
+		
+		// Draw Sprite
+		var sprite = new Image();
+		sprite.src = 'images/blackmage.png';
+		drawMe.drawImage(sprite, p.x - 14, p.y - 21);
 	}
 	for (i in monsters)
 	{
@@ -372,6 +384,7 @@ function update()
 	}
 	//Redraw Map
 	drawMap();
+	setTimeout("update();", 25);
 }
 
 function endGame()
@@ -481,6 +494,9 @@ function spawnTree()
 		tree.resources = 1000*Math.random()+150;
 		tree.x = Math.random()*gameWidth;
 		tree.y = Math.random()*gameHeight;
+		
+		tree.type = (Math.round(Math.random() * 100) % 3) + 1;
+		
 		
 		trees.push(tree);
 }
