@@ -14,6 +14,7 @@ var mapImg;
 var classArray;
 var maxTownHealth = 5000;
 var updateID;
+var turnsSinceSpawn =0;
 function initGame(canvasElement)
 {
 	if (!canvasElement)
@@ -39,7 +40,8 @@ function initGame(canvasElement)
     drawMe = canvasElement.getContext("2d");
     createMap();
     drawMap();
-    spawnHero();
+    spawnHero("Apprentice");
+    spawnHero("Squire");
     spawnMonster();
     drawMap();
     //updateID = setInterval(update,25);
@@ -259,8 +261,8 @@ function distance(a,b)
 function attract(a,b,str) //Function that accelerates a towards b str scales the attraction.  Negative will repel
 {
 	r = Math.max(distance(a,b),10);
-	a.vx = Math.max(-100,Math.min(100,a.vx))
-	a.vy = Math.max(-100,Math.min(100,a.vy))
+	a.vx = Math.max(-25,Math.min(25,a.vx))
+	a.vy = Math.max(-25,Math.min(25,a.vy))
 	a.vx += str*(b.x-a.x)/(r*r);
 	a.vy += str*(b.y-a.y)/(r*r);
 }
@@ -293,7 +295,7 @@ function update()
 	{
 		for (j in monsters)
 		{
-			attract(heros[i],monsters[j],25);
+			attract(heros[i],monsters[j],heros[i].spd*5);
 		}
 		if (monsters.length == 0)
 		{
@@ -356,6 +358,7 @@ function update()
 			{
 				town.health = 0;
 				endGame();
+				return;
 			}
 		}
 	}
@@ -374,8 +377,10 @@ function update()
 		spawnTree();
 	}
 	//Spawn New SpawnPoint
-	if (Math.random()<.001)
+	turnsSinceSpawn++;
+	if (Math.random()<.001 + turnsSinceSpawn/10000)
 	{
+		turnsSinceSpawn = 0;
 		createSpawn();
 		for (i=0;i<=spawnPoints.length/2 + 1;i++)
 		{
@@ -390,7 +395,7 @@ function update()
 function endGame()
 {
 	alert("Game Over!");
-	clearInterval(updateID);
+	//clearInterval(updateID);
 }
 
 function meeleAttack()
@@ -464,13 +469,18 @@ function rangeAttack()
 			efx.sy = this.y;
 			efx.ex = closest.x;
 			efx.ey = closest.y;
+			efx.a = this.x-100+Math.random()*200 ;
+			efx.b = this.y-100+Math.random()*200 ;
+			efx.c = closest.x-100+Math.random()*200 ;
+			efx.d = closest.y-100+Math.random()*200 ;
+			
 			efx.frameLife = 60;
 			efx.draw = function(){
 				//console.log("WTF");
 				drawMe.beginPath();
 				drawMe.strokeStyle = "rgb(20,42,220)";
 				drawMe.moveTo(this.sx,this.sy)
-				drawMe.bezierCurveTo(this.sx+15,this.ex+10,this.sy-10,this.ey-25,this.ex,this.ey)
+				drawMe.bezierCurveTo(this.a,this.b,this.c,this.d,this.ex,this.ey)
 				drawMe.stroke();
 			}
 			effects.push(efx);
@@ -522,7 +532,7 @@ function spawnHero(heroType)
 		promoteHero(hero,heroType);
 	}
 	hero.cd = -1;
-	hero.x = town.x;
-	hero.y = town.y;
+	hero.x = town.x+Math.random()*50-25;
+	hero.y = town.y+Math.random()*50-25;
 	heros.push(hero);
 }
