@@ -273,13 +273,34 @@ function relocate(a)
 	a.vx *=.95;
 	a.vy *=.95;
 }
+function wallForce(a)
+{
+	var k = -.001;
+	if (a.x > gameWidth)
+	{
+		a.vx += (a.x-gameWidth)*k;
+	}
+	if (a.x < 0)
+	{
+		a.vx += (0 - a.x)*k;
+	}
+	if (a.y > gameHeight)
+	{
+		a.vy += (a.y-gameHeight)*k;
+	}
+	if (a.y < 0)
+	{
+		a.vy += (0 - a.y)*k;
+	}
+}
+
 function update()
 {
 	var i,j;
 	//move Monsters
 	for(i in monsters)
 	{
-		
+		wallForce(monsters[i]);
 		for (j in trees)
 		{
 			attract(monsters[i],trees[j],25);
@@ -293,6 +314,7 @@ function update()
 	//move Heros
 	for(i in heros)
 	{
+		wallForce(heros[i]);
 		for (j in monsters)
 		{
 			attract(heros[i],monsters[j],heros[i].spd*5);
@@ -320,12 +342,13 @@ function update()
 		if (monsters.length!=0)
 		{
 			heros[i].attack();
+			checkLvl(heros[i]);
 		}
 		if(town.health < maxTownHealth)
 		{
 			for (j in trees)
 			{
-				if (distance(trees[j],heros[i])<15)
+				if (distance(trees[j],heros[i])<heros[i].rng)
 				{
 					trees[j].resources -=10;
 					town.health +=10;
@@ -392,6 +415,23 @@ function update()
 	setTimeout("update();", 25);
 }
 
+function checkLvl(hero)
+{
+	if (hero.xp>hero.lvl*100)
+	{
+		levelUp(hero);	
+	}
+}
+
+function levelUp(hero)
+{
+	hero.xp -= hero.lvl*100;
+	hero.atkSpd -= 1/3;
+	hero.maxTargets++;
+	hero.rng +=1.1;
+	hero.lvl++;
+}
+
 function endGame()
 {
 	alert("Game Over!");
@@ -408,6 +448,7 @@ function meeleAttack()
 		if (dist(m.x,m.y,this.x,this.y) < this.rng)
 		{
 			m.hp = m.hp - this.atkDmg;
+			this.xp += spawnPoints.length;
 			this.cd = 4;
 			var efx = new Object;
 			efx.frameLife = 4;
@@ -438,65 +479,49 @@ function rangeAttack()
 	var closest;
 	if (this.cd<1)
 	{
+		var atks = this.maxTargets;
 		for (i in monsters)
 		{
 			
 			m = monsters[i];
 			distance = dist(m.x,m.y,this.x,this.y);
-			if (distance < this.rng)
+			
+			if (distance < this.rng && atks > 0)
 			{
-				//console.log(this.rng);
-				if (closest == null)
-				{
-					closest = m;
-					closestDistance = distance;
-				}
-				else if (distance < closestDistance)
-				{
-					closest = m;
-					closestDistance = distance;
-				}
-			}
-		}
-		
-		if (closest != null)
-		{
-			//console.log(closest.hp);
-			this.cd = 6;
-			closest.hp = closest.hp - this.atkDmg
+				console.log(this.maxTargets+":"+atks+" xp:"+this.xp);
+				atks--;
+				this.cd = this.atkSpd;
+				this.xp += spawnPoints.length;
+			monsters[i].hp = monsters[i].hp - this.atkDmg
 			var efx = new Object();
 			efx.sx = this.x;
 			efx.sy = this.y;
-			efx.ex = closest.x;
-			efx.ey = closest.y;
+			efx.ex = monsters[i].x;
+			efx.ey = monsters[i].y;
 			efx.a = this.x-100+Math.random()*200 ;
 			efx.b = this.y-100+Math.random()*200 ;
-			efx.c = closest.x-100+Math.random()*200 ;
-			efx.d = closest.y-100+Math.random()*200 ;
+			efx.c = monsters[i].x-100+Math.random()*200 ;
+			efx.d = monsters[i].y-100+Math.random()*200 ;
 			
 			efx.frameLife = 60;
 			efx.draw = function(){
-				//console.log("WTF");
+				
 				drawMe.beginPath();
 				drawMe.strokeStyle = "rgb(20,42,220)";
 				drawMe.moveTo(this.sx,this.sy)
 				drawMe.bezierCurveTo(this.a,this.b,this.c,this.d,this.ex,this.ey)
 				drawMe.stroke();
-			}
-			effects.push(efx);
-				if (closest.hp < 1 )
-				{
-					for(i in monsters)
-					{
-						if (monsters[i].hp < 1)
-						{
-							monsters.splice(i,1);
-						}
-					}
 				}
+			effects.push(efx);
+				if (monsters[i].hp < 1 )
+				{
+							monsters.splice(i,1);
+				}
+			}
 		}
 	}
 }
+
 
 function spawnTree()
 {
@@ -525,13 +550,19 @@ function spawnHero(heroType)
 		{	
 			//alert("Squire");
 			promoteHero(hero,"Squire");
+			
+			
 		}
 	}
 	else
 	{
 		promoteHero(hero,heroType);
 	}
+	hero.maxTargets = 1;
+	hero.atkSpd = 8;
 	hero.cd = -1;
+	hero.xp =0;
+	hero.lvl = 1;
 	hero.x = town.x+Math.random()*50-25;
 	hero.y = town.y+Math.random()*50-25;
 	heros.push(hero);
