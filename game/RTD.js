@@ -15,6 +15,8 @@ var classArray;
 var maxTownHealth = 5000;
 var updateID;
 var turnsSinceSpawn =0;
+var herbalistLvl=0;
+var carpenterLvl=0;
 
 var counterMonstersKilled = 0;
 var counterMonstersSpawned = 0;
@@ -100,8 +102,8 @@ function createMap(){
 function spawnMonster(){
 	i = Math.floor(spawnPoints.length*Math.random());
 	var monster = new Object();
-	monster.x = spawnPoints[i].x;
-	monster.y = spawnPoints[i].y;
+	monster.x = spawnPoints[i].x + Math.random()*30-15;
+	monster.y = spawnPoints[i].y + Math.random()*30-15;
 	monster.vx = 0;
 	monster.vy = 0;
 	monster.hp = 50;
@@ -320,22 +322,22 @@ function relocate(a)
 }
 function wallForce(a)
 {
-	var k = -.001;
-	if (a.x > gameWidth)
+	var k = .1;
+	if (a.x > gameWidth-10)
 	{
-		a.vx += (a.x-gameWidth)*k;
+		a.vx += (-a.x+gameWidth-10)*k;
 	}
-	if (a.x < 0)
+	if (a.x < 10)
 	{
-		a.vx += (0 - a.x)*k;
+		a.vx += (10 - a.x)*k;
 	}
-	if (a.y > gameHeight)
+	if (a.y > gameHeight-10)
 	{
-		a.vy += (a.y-gameHeight)*k;
+		a.vy += (-a.y+gameHeight-10)*k;
 	}
-	if (a.y < 0)
+	if (a.y < 10)
 	{
-		a.vy += (0 - a.y)*k;
+		a.vy += (10 - a.y)*k;
 	}
 }
 
@@ -396,7 +398,7 @@ function update()
 				if (distance(trees[j],heros[i])<heros[i].rng)
 				{
 					trees[j].resources -=10;
-					town.health +=10;
+					town.health +=10 + carpenterLvl;
 				}
 			}
 		}	
@@ -440,7 +442,7 @@ function update()
 	}
 	
 	//Spawn New Trees
-	if (Math.random()<.01)
+	if (Math.random()<.01 + herbalistLvl)
 	{
 		spawnTree();
 	}
@@ -481,6 +483,8 @@ function levelUp(hero)
 	hero.maxTargets++;
 	hero.rng +=1.1;
 	hero.lvl++;
+	carpenterLvl +=2.5;
+	herbalistLvl +=.001;
 }
 
 function endGame()
