@@ -15,6 +15,13 @@ var classArray;
 var maxTownHealth = 5000;
 var updateID;
 var turnsSinceSpawn =0;
+
+var counterMonstersKilled = 0;
+var counterMonstersSpawned = 0;
+var counterMonsterSpawns = 0;
+var counterCurrentTrees = 0;
+
+
 function initGame(canvasElement)
 {
 	if (!canvasElement)
@@ -22,6 +29,11 @@ function initGame(canvasElement)
         canvasElement = document.createElement("canvas");
 	canvasElement.id = "halma_canvas";
 	document.body.appendChild(canvasElement);
+	
+		$('#halma_canvas').after('<div id="counters"><ul></ul></div>');
+		$('#counters ul').append('<li id="counterMonstersKilled"><strong>Monsters Killed:</strong> <span>0</span></li>');
+		$('#counters ul').append('<li id="counterMonsterSpawns"><strong>Monster Spawns:</strong> <span>0</span></li>');
+		$('#counters ul').append('<li id="counterCurrentTrees"><strong>Current Trees:</strong> <span>0</span></li>');
     }
     else
     {
@@ -101,6 +113,8 @@ function spawnMonster(){
 	//monster.sprite.src = 'images/monster-1.gif';
 	
 	monsters.push(monster);
+	
+	counterMonstersSpawned++;
 }
 
 function createSpawn()
@@ -124,12 +138,26 @@ function drawMap()
 {
 	drawMe.canvas.height = drawMe.canvas.height;
 	
-	drawMe.fillStyle = "rgb(20,240,10)";
+	var bgImg = new Image();
+	bgImg.src = 'images/field.png';
+	
+	drawMe.drawImage(bgImg, 0, 0);
+	
+	/* drawMe.fillStyle = "rgb(20,240,10)";
 	drawMe.fillRect(0,0,gameWidth,gameHeight);
+	 */
 	drawMe.fillStyle = "rgb(139,69,18)";
-	drawMe.arc(town.x,town.y,20,0,Math.PI*2*town.health/maxTownHealth);
+	drawMe.arc(town.x,town.y,30,0,Math.PI*2*town.health/maxTownHealth);
 	drawMe.closePath();
 	drawMe.fill();
+	
+	
+	
+	var townImg = new Image();
+	townImg.src = 'images/castle.png';
+	
+	drawMe.drawImage(townImg, town.x - Math.round(townImg.width/2), town.y - Math.round(townImg.height/2));
+	
 	var p;
 	for (i in trees)
 	{
@@ -151,13 +179,18 @@ function drawMap()
 	for (i in spawnPoints)
 	{
 		p = spawnPoints[i];
-		drawMe.beginPath();
+		/* drawMe.beginPath();
 		//console.log(p);
 		//drawMe.moveTo(p.x,p.y);
 		drawMe.fillStyle = "rgb(200,20,50)";
 		drawMe.arc(p.x,p.y,15,0,7);
 		drawMe.closePath();
-		drawMe.fill();
+		drawMe.fill(); */
+		
+		var img = new Image();
+		img.src = 'images/spawn.png';
+		
+		drawMe.drawImage(img, p.x - Math.round(img.width/2), p.y - Math.round(img.height/2))
 	}
 	for (i in heros)
 	{
@@ -424,6 +457,12 @@ function update()
 	}
 	//Redraw Map
 	drawMap();
+	
+	// Update Counters
+	$('#counterCurrentTrees span').html(trees.length);
+	$('#counterMonsterSpawns span').html(spawnPoints.length);
+	$('#counterMonstersKilled span').html(counterMonstersKilled);
+	
 	setTimeout("update();", 25);
 }
 
@@ -477,6 +516,7 @@ function meeleAttack()
 			if (m.hp < 1 )
 			{
 				monsters.splice(i,1);
+				counterMonstersKilled++;
 				i=i-1;
 			}
 		}
@@ -527,7 +567,9 @@ function rangeAttack()
 			effects.push(efx);
 				if (monsters[i].hp < 1 )
 				{
-							monsters.splice(i,1);
+					monsters.splice(i,1);
+					counterMonstersKilled++;
+					i=i-1;
 				}
 			}
 		}
