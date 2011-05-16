@@ -19,6 +19,8 @@ var herbalistLvl=0;
 var carpenterLvl=0;
 var hue=0;
 
+var controlArray;
+
 var counterMonstersKilled = 0;
 var counterMonstersSpawned = 0;
 var counterMonsterSpawns = 0;
@@ -26,6 +28,7 @@ var counterCurrentTrees = 0;
 
 var controlCanvas;
 var contDraw;
+
 
 function initGame(canvasElement)
 {
@@ -82,17 +85,84 @@ function initGame(canvasElement)
 
 function createControl(){
 	var i
-	for (i=0;i<12;i++)
-	{
-		var x,y;
-		y = Math.floor(i/4)*33;
-		x = i%4*gameWidth/4;
-		contDraw.fillStyle = "rgb(100,100,"+i*10+")";
-		contDraw.fillRect(x,y,gameWidth/4,33);
-		drawRoundRect(contDraw,x+1,y+1,gameWidth/4-3,31);
+	controlArray = Array(12);
+	
+	controlCanvas.addEventListener("click",controlPanelClick,false);
+	
+		for (i=0;i<12;i++)
+		{
 		
+			var x,y;
+			y = Math.floor(i/4)*33;
+			x = i%4*gameWidth/4;
+			contDraw.fillStyle = "rgb(10,100,"+i*10+")";
+			contDraw.fillRect(x,y,gameWidth/4,33);
+			drawRoundRect(contDraw,x+1,y+1,gameWidth/4-3,31);
+			controlArray[i] = new Object();
+			controlArray[i].redraw = basicDraw;
+			controlArray[i].click = basicClick;
+			controlArray[i].text = "";
+		}
+		
+	controlArray[1].click = spawnTree;
+	controlArray[2].click = createSpawn;
+	controlArray[1].text = "Spawn Tree";
+	controlArray[2].text = "Create Spawn";
+	
+}
+
+function basicClick(i)
+{
+	alert("Button " + i+  " clicked.")
+}
+
+function basicDraw(i)
+{
+	//alert(i);
+	console.log(controlArray[i].text);
+	var x,y;
+	y = Math.floor(i/4)*33;
+	x = i%4*gameWidth/4;
+	contDraw.fillStyle = "rgb(10,100,"+i*10+")";
+	contDraw.fillRect(x,y,gameWidth/4,33);
+	drawRoundRect(contDraw,x+1,y+1,gameWidth/4-3,31);
+	contDraw.font = "bold 12px sans-serif rgg(0,0,0)";
+	contDraw.fillStyle = "rgb(0,0,0)";
+	contDraw.fillText(controlArray[i].text,x+33,y+20);
+}
+
+function controlPanelClick(e)
+{
+	var mousePoint = getCursorPosition(e,controlCanvas);
+	var i = Math.floor(mousePoint.y/33)*4+Math.floor(mousePoint.x*4/gameWidth);
+	controlArray[i].click();
+}
+
+function getCursorPosition(e, refObj) // returns an object that has the x and y coordinates of the nouse click relative to the canvas
+{
+	var x;
+	var y;
+	
+	if (e.pageX!= undefined && e.pageY != undefined)
+	{
+		x = e.pageX;
+		y = e.pageY;	
+	}
+	else
+	{
+		x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 	}
 	
+	x-= refObj.offsetLeft;
+	y-= refObj.offsetTop;
+	
+	var mousePoint = new Object();
+	mousePoint.x = x;
+	mousePoint.y = y;
+	
+	
+	return mousePoint;
 }
 
 function drawRoundRect(paper,x,y,w,h)
@@ -237,6 +307,11 @@ function dist(x1,y1,x2,y2)
 function drawMap()
 {
 	drawMe.canvas.height = drawMe.canvas.height;
+	var i;
+	for (i = 0;i<12;i++)
+	{
+		basicDraw(i);
+	}
 	
 	var bgImg = new Image();
 	bgImg.src = 'images/field.png';
