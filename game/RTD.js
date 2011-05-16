@@ -17,25 +17,39 @@ var updateID;
 var turnsSinceSpawn =0;
 var herbalistLvl=0;
 var carpenterLvl=0;
+var hue=0;
 
 var counterMonstersKilled = 0;
 var counterMonstersSpawned = 0;
 var counterMonsterSpawns = 0;
 var counterCurrentTrees = 0;
 
+var controlCanvas;
+var contDraw;
 
 function initGame(canvasElement)
 {
 	if (!canvasElement)
 	 {
+	 	
+	 	controlCanvas = document.createElement("canvas");
+		controlCanvas.id = "control_canvas";
+		document.body.appendChild(controlCanvas);
+		
         canvasElement = document.createElement("canvas");
-	canvasElement.id = "halma_canvas";
-	document.body.appendChild(canvasElement);
+		canvasElement.id = "halma_canvas";
+		document.body.appendChild(canvasElement);
+	
+	
 	
 		$('#halma_canvas').after('<div id="counters"><ul></ul></div>');
 		$('#counters ul').append('<li id="counterMonstersKilled"><strong>Monsters Killed:</strong> <span>0</span></li>');
 		$('#counters ul').append('<li id="counterMonsterSpawns"><strong>Monster Spawns:</strong> <span>0</span></li>');
 		$('#counters ul').append('<li id="counterCurrentTrees"><strong>Current Trees:</strong> <span>0</span></li>');
+		$('#counters ul').append('<li id="counterSquireLevel"><strong>Squire Level:</strong> <span>0</span></li>');
+		$('#counters ul').append('<li id="counterSquireXP"><strong>Squire XP:</strong> <span>0</span></li>');
+		$('#counters ul').append('<li id="counterApprenticeLevel"><strong>Apprentice Level:</strong> <span>0</span></li>');
+		$('#counters ul').append('<li id="counterApprenticeXP"><strong>Apprentice XP:</strong> <span>0</span></li>');
     }
     else
     {
@@ -44,6 +58,8 @@ function initGame(canvasElement)
     defineClasses();
     canvasElement.width = gameWidth;
     canvasElement.height = gameHeight;
+    controlCanvas.width = gameWidth;
+    controlCanvas.height = 99;
     town = new Object();
     heros = new Array();
     monsters = new Array();
@@ -52,6 +68,8 @@ function initGame(canvasElement)
     effects = new Array();
     spawnPoints = new Array();
     drawMe = canvasElement.getContext("2d");
+    contDraw = controlCanvas.getContext("2d");
+    createControl();
     createMap();
     drawMap();
     spawnHero("Apprentice");
@@ -62,6 +80,36 @@ function initGame(canvasElement)
 	update();
 }
 
+function createControl(){
+	var i
+	for (i=0;i<12;i++)
+	{
+		var x,y;
+		y = Math.floor(i/4)*33;
+		x = i%4*gameWidth/4;
+		contDraw.fillStyle = "rgb(100,100,"+i*10+")";
+		contDraw.fillRect(x,y,gameWidth/4,33);
+		drawRoundRect(contDraw,x+1,y+1,gameWidth/4-3,31);
+		
+	}
+	
+}
+
+function drawRoundRect(paper,x,y,w,h)
+{
+	var p = Math.PI;
+	paper.beginPath();
+	var r = Math.min(w,h)/2; 
+	paper.moveTo(x+r,y);
+	paper.lineTo(x+w-r,y);
+	//paper.arcTo(x+w-r,y,x+w-r,y+h,r);
+	paper.arc(x+w-r,y+r,r,3*p/2,p/2,false);
+	paper.lineTo(x+r,y+h);
+	//paper.arcTo(x+r,y+h,x+r,y,r);
+	paper.arc(x+r,y+r,r,p/2,3*p/2,false);
+	paper.storkeStyle = "rgb(0,0,0)";
+	paper.stroke();
+}
 
 function createMap(){
 	
@@ -76,6 +124,56 @@ function createMap(){
 	drawMe.fill();
 	
 	createSpawn();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+		spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+		spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+		spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+		spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
+	spawnTree();
 	spawnTree();
 	spawnTree();
 	spawnTree();
@@ -107,7 +205,7 @@ function spawnMonster(){
 	monster.vx = 0;
 	monster.vy = 0;
 	monster.hp = 50;
-	monster.atk = 50;
+	monster.atk = 50 + spawnPoints.length*5;
 	monster.color = "rgb(0,0,0)";
 	
 	monster.sprite = document.getElementById('img-monster-1');
@@ -258,8 +356,8 @@ function defineClasses()
 	classArray[1][0] = "Squire";
 	classArray[1][1] = "25";
 	classArray[1][2] = "15";
-	classArray[1][3] = "2";
-	classArray[1][4] = "1";
+	classArray[1][3] = "3";
+	classArray[1][4] = "2";
 	classArray[1][5] = meeleAttack;
 	classArray[1][6] = noSpecial;
 	classArray[1][7] = "rgb(200,100,100)";
@@ -464,6 +562,11 @@ function update()
 	$('#counterCurrentTrees span').html(trees.length);
 	$('#counterMonsterSpawns span').html(spawnPoints.length);
 	$('#counterMonstersKilled span').html(counterMonstersKilled);
+	$('#counterSquireLevel span').html(heros[1].lvl);
+	$('#counterSquireXP span').html(heros[1].xp);
+	$('#counterApprenticeLevel span').html(heros[0].lvl);
+	$('#counterApprenticeXP span').html(heros[0].xp);
+	
 	
 	setTimeout("update();", 25);
 }
@@ -512,7 +615,10 @@ function meeleAttack()
 			efx.rng = this.rng
 			efx.draw = function(){
 				drawMe.beginPath();
-				drawMe.strokeStyle = "rgb(0,20,40)";
+				drawMe.lineWidth = 5;
+				drawMe.strokeStyle = "rgb(0,0,0)";
+   				drawMe.shadowColor = 'white';
+   				drawMe.shadowBlur = 10;
 				drawMe.arc(this.x,this.y,this.rng,0,7);
 				drawMe.stroke();
 			}
@@ -559,11 +665,15 @@ function rangeAttack()
 			efx.c = monsters[i].x-100+Math.random()*200 ;
 			efx.d = monsters[i].y-100+Math.random()*200 ;
 			
-			efx.frameLife = 60;
+			efx.frameLife = 15;
 			efx.draw = function(){
 				
 				drawMe.beginPath();
-				drawMe.strokeStyle = "rgb(20,42,220)";
+				drawMe.lineWidth = 5;
+				hue += Math.random()*10;
+				drawMe.strokeStyle ='hsl(' + hue + ', 50%, 50%)';
+   				drawMe.shadowColor = 'white';
+   				drawMe.shadowBlur = 10;
 				drawMe.moveTo(this.sx,this.sy)
 				drawMe.bezierCurveTo(this.a,this.b,this.c,this.d,this.ex,this.ey)
 				drawMe.stroke();
