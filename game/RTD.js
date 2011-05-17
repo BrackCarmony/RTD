@@ -18,6 +18,9 @@ var turnsSinceSpawn =0;
 var herbalistLvl=0;
 var carpenterLvl=0;
 var hue=0;
+var currentHero=0;
+var App;
+var Sqr;
 
 var controlArray;
 
@@ -28,6 +31,9 @@ var counterCurrentTrees = 0;
 
 var controlCanvas;
 var contDraw;
+
+var AppMenu;
+var SqrMenu;
 
 
 function initGame(canvasElement)
@@ -76,12 +82,238 @@ function initGame(canvasElement)
     createMap();
     drawMap();
     spawnHero("Apprentice");
+    App = heros[0];
     spawnHero("Squire");
+    Sqr = heros[1];
     spawnMonster();
     drawMap();
+    startHeroStats();
+    defineAppMenu();
+    defineSqrMenu();
+    
+    changeToApprentice();
     //updateID = setInterval(update,25);
 	update();
 }
+
+function upAppDmg()
+{
+	if (App.xp > 100)
+	{
+		App.atkDmg *= 1.5;
+		App.xp-=100;
+		AppMenu[4].text = "Damage: " + Math.floor(App.atkDmg);
+		AppMenu[1].text = "XP: " + Math.floor(App.xp);
+	}
+}
+
+function upAppRng()
+{
+	if (App.xp > 300)
+	{
+		App.rng += 15;
+		App.xp-=300;
+		AppMenu[5].text = "Range: " + Math.floor(App.rng);
+		AppMenu[1].text = "XP: " + Math.floor(App.xp);
+	}
+}
+
+function upAppAtkSpd()
+{
+	if (App.xp > 500)
+	{
+		App.atkSpd -= 1;
+		App.xp-=500;
+		AppMenu[6].text = "Atk CD: " + Math.floor(App.atkSpd);
+		AppMenu[1].text = "XP: " + Math.floor(App.xp);
+	}
+}
+
+function upAppTgt()
+{
+	if (App.xp > 1000)
+	{
+		App.maxTargets += 1;
+		App.xp-=1000;
+		AppMenu[7].text = "Max Targets: " + Math.floor(App.maxTargets);
+		AppMenu[1].text = "XP: " + Math.floor(App.xp);
+	}
+}
+
+function upAppSpd()
+{
+	if (App.xp > 100)
+	{
+		App.spd += 1 ;
+		App.xp-=100;
+		AppMenu[8].text = "Move Spd: " + Math.floor(App.spd);
+		AppMenu[1].text = "XP: " + Math.floor(App.xp);
+	}
+}
+
+function upSqrDmg()
+{
+	if (Sqr.xp > 100)
+	{
+		Sqr.atkDmg *= 1.5;
+		Sqr.xp-=100;
+		SqrMenu[4].text = "Damage: " + Math.floor(Sqr.atkDmg);
+		SqrMenu[1].text = "XP: " + Math.floor(Sqr.xp);
+	}
+}
+
+function upSqrRng()
+{
+	if (Sqr.xp > 300)
+	{
+		Sqr.rng += 5;
+		Sqr.xp-=300;
+		SqrMenu[5].text = "Range: " + Math.floor(Sqr.rng);
+		SqrMenu[1].text = "XP: " + Math.floor(Sqr.xp);
+	}
+}
+
+function upSqrAtkSpd()
+{
+	if (Sqr.xp > 500)
+	{
+		Sqr.atkSpd -= 1;
+		Sqr.xp-=500;
+		SqrMenu[6].text = "Atk CD: " + Math.floor(Sqr.atkSpd);
+		SqrMenu[1].text = "XP: " + Math.floor(Sqr.xp);
+	}
+}
+
+function upSqrCritRate()
+{
+	if (Sqr.xp > 250)
+	{
+		Sqr.critRate += .05;
+		Sqr.xp-=1000;
+		SqrMenu[7].text = "Crit Rate: " + Sqr.critRate + "%";
+		SqrMenu[1].text = "XP: " + Math.floor(Sqr.xp);
+	}
+}
+
+function upSqrSpd()
+{
+	if (Sqr.xp > 100)
+	{
+		Sqr.spd += 1 ;
+		Sqr.xp-=100;
+		SqrMenu[8].text = "Move Spd: " + Math.floor(Sqr.spd);
+		SqrMenu[1].text = "XP: " + Math.floor(Sqr.xp);
+	}
+}
+
+function startHeroStats()
+{
+	App.atkDmg = 20;
+	App.rng = 60;
+	App.spd = 10;
+	App.atkSpd = 10;
+	App.maxTargets = 1;
+	
+	Sqr.atkDmg = 30;
+	Sqr.rng = 20;
+	Sqr.spd = 25;
+	Sqr.atkSpd = 5;
+	Sqr.critRate =.05;
+	Sqr.maxTargets = 5;
+	
+	/*hero.lvl =1;
+	hero.hp =classArray[i][1]*10*(1+Math.random()*.3);
+	hero.atkDmg =classArray[i][2]*10*(1+Math.random()*.3);
+	hero.rng =classArray[i][3]*10*(1+Math.random()*.3);
+	hero.spd =classArray[i][4]*10*(1+Math.random()*.3);
+	hero.attack =classArray[i][5];
+	hero.special = classArray[i][6];
+	hero.color = classArray[i][7];
+	hero.vx = 0;
+	hero.vy = 0;*/
+}
+function changeActive()
+{
+	
+}
+
+function changeToApprentice()
+{
+	controlArray = AppMenu;
+}
+function changeToSquire()
+{
+	controlArray = SqrMenu;
+}
+
+function defineAppMenu()
+{
+	AppMenu = Array(12);
+	for(i = 0;i<12;i++)
+	{
+		AppMenu[i] = new Object();
+	}
+	AppMenu[0].click = changeToSquire;
+	AppMenu[0].text = "Apprentice";
+	AppMenu[1].click = noFunction;
+	AppMenu[1].text = "XP: "+Math.floor(App.xp);
+	AppMenu[2].click = noFunction;
+	AppMenu[2].text = "Kills: ";
+	AppMenu[3].click = noFunction;
+	AppMenu[3].text = "";
+	AppMenu[4].click = upAppDmg;
+	AppMenu[4].text = "Damage: " +Math.floor( App.atkDmg);
+	AppMenu[5].click = upAppRng;
+	AppMenu[5].text = "Range: " +Math.floor( App.rng);
+	AppMenu[6].click = upAppAtkSpd;
+	AppMenu[6].text = "Atk CD: "+Math.floor( App.atkSpd);
+	AppMenu[7].click = upAppTgt;
+	AppMenu[7].text = "Max Targets: "+Math.floor( App.maxTargets);
+	AppMenu[8].click = upAppSpd;
+	AppMenu[8].text = "Move Spd: "+Math.floor( App.spd);
+	AppMenu[9].click = noFunction;
+	AppMenu[9].text = "";
+	AppMenu[10].click = noFunction;
+	AppMenu[10].text = "";
+	AppMenu[11].click = noFunction;
+	AppMenu[11].text = "";
+}
+
+function defineSqrMenu()
+{
+	SqrMenu = Array(12);
+	for(i = 0;i<12;i++)
+	{
+		SqrMenu[i] = new Object();
+	}
+	SqrMenu[0].click = changeToApprentice;
+	SqrMenu[0].text = "Squire";
+	SqrMenu[1].click = noFunction;
+	SqrMenu[1].text = "XP: "+Math.floor(Sqr.xp);
+	SqrMenu[2].click = noFunction;
+	SqrMenu[2].text = "Kills: "+Math.floor(Sqr.kills);
+	SqrMenu[3].click = noFunction;
+	SqrMenu[3].text = "";
+	SqrMenu[4].click = upSqrDmg;
+	SqrMenu[4].text = "Damage: " +Math.floor( Sqr.atkDmg);
+	SqrMenu[5].click = upSqrRng;
+	SqrMenu[5].text = "Range: " +Math.floor( Sqr.rng);
+	SqrMenu[6].click = upSqrAtkSpd;
+	SqrMenu[6].text = "Atk CD: "+Math.floor( Sqr.atkSpd);
+	SqrMenu[7].click = upSqrCritRate;
+	SqrMenu[7].text = "Crit Rate: "+ Sqr.critRate +"%";
+	SqrMenu[8].click = upSqrSpd;
+	SqrMenu[8].text = "Move Spd: "+Math.floor( Sqr.spd);
+	SqrMenu[9].click = noFunction;
+	SqrMenu[9].text = "";
+	SqrMenu[10].click = noFunction;
+	SqrMenu[10].text = "";
+	SqrMenu[11].click = noFunction;
+	SqrMenu[11].text = "";
+}
+
+function noFunction(){}
+
 
 function createControl(){
 	var i
@@ -119,7 +351,7 @@ function basicClick(i)
 function basicDraw(i)
 {
 	//alert(i);
-	console.log(controlArray[i].text);
+	//console.log(controlArray[i].text);
 	var x,y;
 	y = Math.floor(i/4)*33;
 	x = i%4*gameWidth/4;
@@ -128,7 +360,7 @@ function basicDraw(i)
 	drawRoundRect(contDraw,x+1,y+1,gameWidth/4-3,31);
 	contDraw.font = "bold 12px sans-serif rgg(0,0,0)";
 	contDraw.fillStyle = "rgb(0,0,0)";
-	contDraw.fillText(controlArray[i].text,x+33,y+20);
+	contDraw.fillText(controlArray[i].text,x+5,y+20);
 }
 
 function controlPanelClick(e)
@@ -194,76 +426,9 @@ function createMap(){
 	drawMe.fill();
 	
 	createSpawn();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-		spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-		spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-		spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-		spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
-	spawnTree();
+	for (var initTrees=0;initTrees<20;initTrees++)
+	{spawnTree();}
 	spawnMonster();
-	//update();
-	//update();
-	//update();
-	//for(i=0;i<500;i++)
-	//{
-	//	update();
-	//}
 }
 
 
@@ -274,8 +439,9 @@ function spawnMonster(){
 	monster.y = spawnPoints[i].y + Math.random()*30-15;
 	monster.vx = 0;
 	monster.vy = 0;
-	monster.hp = 50;
-	monster.atk = 50 + spawnPoints.length*5;
+	monster.hp = 10* Math.pow(spawnPoints.length,1.75);
+	monster.xp = 10 * Math.pow(spawnPoints.length+1,.5);
+	monster.atk = 5 + spawnPoints.length*5;
 	monster.color = "rgb(0,0,0)";
 	
 	monster.sprite = document.getElementById('img-monster-1');
@@ -553,6 +719,13 @@ function update()
 				attract(heros[i],town,50);
 			}
 		}
+		for (j in heros)
+		{
+			if (i!=j)
+			{
+				attract(heros[i],heros[j],-15);
+			}
+		}
 			relocate(heros[i]);
 	}
 	//Heros Attack
@@ -579,11 +752,13 @@ function update()
 	//Monsters Nom Stuff
 	for(i in monsters)
 	{
+		var hungry = true
 		for(j in trees)
 		{
-			if (distance(monsters[i],trees[j]) < 15 )
+			if (distance(monsters[i],trees[j]) < 15 && hungry)
 			{
 				//console.log(trees[j].resources);
+				hungry = false
 				trees[j].resources -= monsters[i].atk;
 				if (trees[j].resources < 0)
 				{
@@ -594,7 +769,7 @@ function update()
 				}
 			}
 		}
-		if (distance(monsters[i],town)<15)
+		if (distance(monsters[i],town)<15 && hungry)
 		{
 			town.health -= monsters[i].atk;
 			if (town.health <= 0)
@@ -606,7 +781,7 @@ function update()
 		}
 	}
 	//Spawn New Monster
-	if (Math.random()<.01)
+	if (Math.random()<.02)
 	{
 		for (i=0;i<=spawnPoints.length/2 + 1;i++)
 		{
@@ -621,7 +796,7 @@ function update()
 	}
 	//Spawn New SpawnPoint
 	turnsSinceSpawn++;
-	if (Math.random()<.001 + turnsSinceSpawn/10000)
+	if (Math.random()<.0001 + turnsSinceSpawn/100000)
 	{
 		turnsSinceSpawn = 0;
 		createSpawn();
@@ -650,7 +825,7 @@ function checkLvl(hero)
 {
 	if (hero.xp>hero.lvl*100)
 	{
-		levelUp(hero);	
+	//	levelUp(hero);	
 	}
 }
 
@@ -674,35 +849,45 @@ function endGame()
 function meeleAttack()
 {
 	//console.log("Meele Attack");
-	for(i in monsters)
+	attacks = 0;
+	if (this.cd<1)
 	{
-		var m;
-		m = monsters[i];
-		if (dist(m.x,m.y,this.x,this.y) < this.rng)
+		for(i in monsters)
 		{
-			m.hp = m.hp - this.atkDmg;
-			this.xp += spawnPoints.length;
-			this.cd = 4;
-			var efx = new Object;
-			efx.frameLife = 4;
-			efx.x = this.x;
-			efx.y = this.y;
-			efx.rng = this.rng
-			efx.draw = function(){
-				drawMe.beginPath();
-				drawMe.lineWidth = 5;
-				drawMe.strokeStyle = "rgb(0,0,0)";
-   				drawMe.shadowColor = 'white';
-   				drawMe.shadowBlur = 10;
-				drawMe.arc(this.x,this.y,this.rng,0,7);
-				drawMe.stroke();
-			}
-			effects.push(efx);
-			if (m.hp < 1 )
+			var m;
+			m = monsters[i];
+			if (dist(m.x,m.y,this.x,this.y) < this.rng && attacks < this.maxTargets)
 			{
-				monsters.splice(i,1);
-				counterMonstersKilled++;
-				i=i-1;
+				attacks++;
+				console.log(attacks);
+				m.hp = m.hp - this.atkDmg;
+				
+				this.cd = this.atkSpd;
+				var efx = new Object;
+				efx.frameLife = 0;
+				efx.x = this.x;
+				efx.y = this.y;
+				efx.rng = this.rng
+				efx.draw = function(){
+					drawMe.beginPath();
+					drawMe.lineWidth = 5;
+					drawMe.strokeStyle = "rgb(0,0,0)";
+	   				drawMe.shadowColor = 'white';
+	   				drawMe.shadowBlur = 10;
+					drawMe.arc(this.x,this.y,this.rng,0,7);
+					drawMe.stroke();
+				}
+				//effects.push(efx);
+				if (m.hp < 1 )
+				{
+					this.xp += m.xp;
+					SqrMenu[1].text = "XP: " + Math.floor(this.xp);
+					monsters.splice(i,1);
+					counterMonstersKilled++;
+					this.kills++;
+					SqrMenu[2].text = "Kills: " + this.kills;
+					i=i-1;
+				}
 			}
 		}
 	}
@@ -725,10 +910,10 @@ function rangeAttack()
 			
 			if (distance < this.rng && atks > 0)
 			{
-				console.log(this.maxTargets+":"+atks+" xp:"+this.xp);
+				//console.log(this.maxTargets+":"+atks+" xp:"+this.xp);
 				atks--;
 				this.cd = this.atkSpd;
-				this.xp += spawnPoints.length;
+				
 			monsters[i].hp = monsters[i].hp - this.atkDmg
 			var efx = new Object();
 			efx.sx = this.x;
@@ -756,8 +941,15 @@ function rangeAttack()
 			effects.push(efx);
 				if (monsters[i].hp < 1 )
 				{
-					monsters.splice(i,1);
+						
+					this.xp += monsters[i].xp;;
+					AppMenu[1].text = "XP: "+ Math.floor(this.xp);
+					this.kills ++;
+					AppMenu[2].text = "Kills: "+this.kills;
 					counterMonstersKilled++;
+					monsters.splice(i,1);
+					
+					
 					i=i-1;
 				}
 			}
@@ -806,6 +998,7 @@ function spawnHero(heroType)
 	hero.cd = -1;
 	hero.xp =0;
 	hero.lvl = 1;
+	hero.kills = 0;
 	hero.x = town.x+Math.random()*50-25;
 	hero.y = town.y+Math.random()*50-25;
 	heros.push(hero);
