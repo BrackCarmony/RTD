@@ -544,7 +544,15 @@ function drawMap()
 		
 		// Draw Sprite
 		var sprite = new Image();
-		sprite.src = 'images/blackmage.png';
+		if(p.heroType == 'Squire')
+		{
+			sprite.src = 'images/blackmage.png';
+		}
+		else
+		{
+			sprite.src = 'images/fighter.png';
+		}
+		
 		drawMe.drawImage(sprite, p.x - 14, p.y - 21);
 	}
 	for (i in monsters)
@@ -608,7 +616,7 @@ function defineClasses()
 function promoteHero(hero,heroType)
 {
 	var i,j;
-	hero.heroTyoe= heroType;
+	hero.heroType= heroType;
 	//i = classID[heroType];
 	if (heroType == "Apprentice")
 		i = 0;
